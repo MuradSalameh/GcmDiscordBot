@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+		
+		<!-- url -->
+		<property name= "hibernate.connection.url">jdbc:mysql://localhost:3306/gcm</property>
+		
+		<!-- username -->
+		<property name= "hibernate.connection.username">gcmconn</property>
+
+		<!-- password -->
+		<property name= "hibernate.connection.password">1GcmConn!</property>
+		
+		<!-- mysql driver -->
+		<property name= "hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+		
+		<!-- dialect -->
+		 <property name="hibernate.dialect">org.hibernate.dialect.MySQL8Dialect</property>
+		
+		<!-- show sql -->
+		<property name= "hibernate.show_sql">true</property>
+		
+		<!-- create tables if not existing or update if existing -->
+		 <property name="hibernate.hbm2ddl.auto">update</property>
+		 
+		<mapping class="hibernate.model.Expense"/>
+		<mapping class="hibernate.model.Game"/>
+		<mapping class="hibernate.model.Member"/>
+		<mapping class="hibernate.model.Partner"/>
+		<mapping class="hibernate.model.Revenue"/>	
+		<mapping class="hibernate.model.Role"/>
+		<mapping class="hibernate.model.Social"/>
+		<mapping class="hibernate.model.Team"/>
+		<mapping class="hibernate.model.Event"/>
+		<mapping class="hibernate.model.Tournament"/>
+		<mapping class="hibernate.model.MemberSocials"/>
+		<mapping class="hibernate.model.MemberRoles"/>
+		<mapping class="hibernate.model.MemberTeam"/>
+		<mapping class="hibernate.model.MemberGames"/>
+		<mapping class="hibernate.model.MemberEvents"/>
+		<mapping class="hibernate.model.TournamentsTeams"/>
+		<mapping class="hibernate.model.TournamentGame"/>
+		
+		
+	</session-factory>
+</hibernate-configuration>
