@@ -42,19 +42,29 @@ public class Scheduler {
 		}
 	}
 
-	public static List<Member> getBirthdays() {
+	public static List<Long> getBirthdays() {
 		List<Member> members = MemberDAO.getTodaysMembersBirthdays();
 		if (members.isEmpty()) {
 			System.out.println("No Birthdays Today");
 		}
 
-		ArrayList<Member> ol = new ArrayList<Member>();
+		ArrayList<Long> userIdList = new ArrayList<Long>();
 
 		for (Member m : members) {
-			ol.add(m);
+			userIdList.add(Long.parseLong(m.getClanId()));
 			System.out.println(m);
 		}
-		return members;
+		return userIdList;
+
+		// USERLISTE MIT LONG ID ZURÜCKGEBEN,
+	}
+
+	// ":birthday: :gift: Alles Beste zum Geburtstag!!! :champagne_glass:
+	// :champagne:"
+
+	public static void getDiscordUserById() {
+		// long userId = MemberDAO.User.fromId(userId);
+
 	}
 
 }
