@@ -8,6 +8,8 @@ import helperClasses.Scheduler;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.OnlineStatus;
+import net.dv8tion.jda.api.events.ReadyEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class Main {
 
@@ -21,16 +23,24 @@ public class Main {
 		builder.addEventListeners(new SendEmbeds());
 		builder.addEventListeners(new Command());
 		builder.addEventListeners(new VoiceActivityTracker());
-		shardMan = builder.build();
-		System.out.println("[Bot] Online!");
+		builder.addEventListeners(new ListenerAdapter() {
+			@Override
+			public void onReady(ReadyEvent event) {
 
-		Scheduler s = new Scheduler();
-		try {
-			s.scheduleTask();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+				try {
+					new Scheduler(event.getJDA()).start();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			} // starts your channel with the ready event
+
+		}).build();
+
+		// shardMan = builder.build();
+
+		System.out.println("[Bot] Online!");
 
 	}
 

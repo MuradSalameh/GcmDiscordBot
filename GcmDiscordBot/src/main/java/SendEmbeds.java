@@ -2,7 +2,6 @@ import java.awt.Color;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
-import helperClasses.Scheduler;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -36,13 +35,6 @@ public class SendEmbeds extends ListenerAdapter {
 		builder.addBlankField(true);
 		builder.setThumbnail(guild.getIconUrl());
 		return builder;
-	}
-
-	public void ScheduledBirthdayMessages() throws InterruptedException {
-		// SchedulerTest
-		Scheduler s = new Scheduler();
-		s.scheduleTask();
-
 	}
 
 }
