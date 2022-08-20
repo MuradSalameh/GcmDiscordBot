@@ -16,9 +16,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class Scheduler extends ListenerAdapter {
 	public static JDABuilder builder;
-
 	private static int counter = 0;
-
 	private static JDA api = null;
 
 	public Scheduler(JDA api) {
@@ -32,7 +30,6 @@ public class Scheduler extends ListenerAdapter {
 	public static TextChannel targetTextChannel() {
 		// TextChannel textChannel = jda.getTextChannelById("703612269644218452");
 		TextChannel textChannel = api.getTextChannelsByName("log-channel", true).get(0);
-
 		return textChannel;
 	}
 
@@ -72,9 +69,7 @@ public class Scheduler extends ListenerAdapter {
 
 			// Methods
 			// -------------------------------------------------------------------
-
 			sendBirthdayMessage();
-
 			// -------------------------------------------------------------------
 
 		};
@@ -92,5 +87,4 @@ public class Scheduler extends ListenerAdapter {
 			}
 		}
 	}
-
 }
