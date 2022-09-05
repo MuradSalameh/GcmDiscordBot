@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.dao.RevenueDAO;
 import hibernate.model.Revenue;
 
@@ -14,7 +14,7 @@ public class RevenueDAOTest {
 
 	public static void main(String[] args) {
 
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		int id = 4;
 		int id2 = 5;
 		int id3 = 5;
@@ -56,7 +56,7 @@ public class RevenueDAOTest {
 	}
 
 	public static void updateRevenueTest(int id, String s) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 
 		// Vorhandenen Revenue anhand id aus DB holen
 		Revenue m = session.get(Revenue.class, id);

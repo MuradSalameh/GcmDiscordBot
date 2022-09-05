@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.dao.TeamDAO;
 import hibernate.model.Team;
 
@@ -13,7 +13,7 @@ public class TeamDAOTest {
 
 	public static void main(String[] args) {
 
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		int id = 1;
 		int id2 = 5;
 		int id3 = 5;
@@ -69,7 +69,7 @@ public class TeamDAOTest {
 	}
 
 	public static void updateTeamTest(int id, String s) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 
 		// Vorhandenen Team anhand id aus DB holen
 		Team m = session.get(Team.class, id);

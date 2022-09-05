@@ -1,30 +1,35 @@
 package hibernate.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.model.Member;
 import hibernate.model.MemberTeam;
 import hibernate.model.Team;
 
-public class MemberDAO {
 
+public class MemberDAO {
+    // database access methods
+    
+    // add member
 	public static void addMember(Member bean) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		session.persist(bean);
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 
+	
+	// assign member to team in MemberTeams table
 	public static void addMemberToTeam(int memberID, int teamID) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		Member m = session.get(Member.class, memberID);
@@ -36,72 +41,101 @@ public class MemberDAO {
 
 		session.save(mt);
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 
+	
+	// get member
 	public static Member getMember(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		Member member = session.get(Member.class, id);
-
+		tx.commit();
+		 session.clear();
+		 session.close();
 		return member;
 	}
 
+	
+	// get member with highest id
 	public static Member getMemberWithHighestId() {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		// String hql = "select max(id) from Member";
 		Integer maxId = (Integer) session.createNativeQuery("select max(id) from Member").getSingleResult();
 
 		Member member = session.get(Member.class, maxId);
-
+		
+		 session.clear();
+		 session.close();
 		return member;
 	}
 
+	
+	// get list of all members
 	public static List<Member> getMembers() {
-		Session session = DiscordSessionUtil.getSession();
-		String hql = "from Member";
-		Query query = session.createQuery(hql);
-		List<Member> members = new ArrayList<Member>(query.list());
-		session.close();
-		return members;
+		Session session = SessionUtil.getSession();
+		
+		List<Member> list = session.createQuery(
+			"select o from Member o",
+			Member.class)
+			.getResultList();
+
+
+		for (Member t : list) {		
+			System.out.println(t);
+		}
+		
+		
+		 session.clear();
+		 session.close();
+		return list;
 	}
 
+	
+	// get members by team id from MemberTeams table
 	public static List<Member> getMembersByTeamId(int id) {
-		Session session = DiscordSessionUtil.getSession();
-		String hql = "from MemberTeam member_id where team_id= :id";
-		Query query = session.createQuery(hql);
-		query.setParameter("id", id);
-		List<MemberTeam> membersTeam = query.list();
+	    
 
-		List<Member> filteredMembersList = new ArrayList<>();
+		Session session = SessionUtil.getSession();
+	
+		List<Member> teamsMembers = session.createQuery(
+			"select member m from MemberTeam tt where team.id= :id",
+			Member.class)
+			.setParameter("id", id).getResultList();
 
-		for (MemberTeam m : membersTeam) {
-			int sId = m.getMember().getId();
-			Member s = session.get(Member.class, sId);
-			filteredMembersList.add(s);
-			System.out.println(s);
+		for (Member m : teamsMembers) {		
+			System.out.println(m);
 		}
 
-		session.close();
-		return filteredMembersList;
+
+
+		
+		 session.clear();
+		 session.close();
+		return teamsMembers;
 	}
 
-	// -------- Get all members with Birthday ------
+	// get all members who have birthday today
 
 	public static List<Member> getTodaysMembersBirthdays() {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		String hql = "from Member m where day(m.birthday) = day(CURRENT_DATE) and month(m.birthday) = month(CURRENT_DATE)";
 		Query query = session.createQuery(hql);
 		List<Member> membersBirthday = query.list();
 
-		session.close();
+		
+		 session.clear();
+		 session.close();
 		return membersBirthday;
 
 	}
 
+	
+	// delete member
 	public static void deleteMember(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		// Member member = session.get(Member.class, id);
@@ -109,79 +143,76 @@ public class MemberDAO {
 		session.remove(member);
 		// session.delete(session.find(Member.class, id));
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 
+	
+	// delete member from all roles in MemberRoles table
 	public static void deleteMemberFromRoles(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
-		// Delete connection from MemberRoles Table
-		// ROM a WHERE a.b = :par1 OR a.c = :par2").setParameter("par1",
-		// obj).setParameter("par2", obj);
-		String hql = "delete from MemberRoles id where member_id= :memberid";
+		String hql = "delete from MemberRoles mr where member.id= :memberid";
 		Query query = session.createQuery(hql);
 		query.setParameter("memberid", id);
 
 		int count = query.executeUpdate();
 		System.out.println(count + " Record(s) Deleted.");
 
-		// Remove from Role Table
-//		Role role = session.get(Role.class, id);
-//		session.remove(role);
 
 		tx.commit();
 		session.clear();
 		session.close();
 	}
 
+	
+	// delete member from all events in MemberEvents table
 	public static void deleteMemberFromEvents(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
-		// Delete connection from MemberMembers Table
-		String hql = "delete from MemberEvents id where member_id= :id";
+
+		String hql = "delete from MemberEvents me where member.id= :id";
 		Query query = session.createQuery(hql);
 		query.setParameter("id", id);
 
 		int count = query.executeUpdate();
 		System.out.println(count + " Record(s) Deleted.");
 
-		// Remove from Member Table
-		// Member member = session.get(Member.class, id);
-		// session.remove(member);
 
 		tx.commit();
 		session.clear();
 		session.close();
 	}
 
+	
+	// delete member from all teams in MemberTeam table
 	public static void deleteMemberFromTeams(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
-		// Delete connection from MemberMembers Table
-		String hql = "delete from MemberTeam id where member_id= :id";
+
+		String hql = "delete from MemberTeam mt where member.id= :id";
 		Query query = session.createQuery(hql);
 		query.setParameter("id", id);
 
 		int count = query.executeUpdate();
 		System.out.println(count + " Record(s) Deleted.");
 
-		// Remove from Member Table
-		// Member member = session.get(Member.class, id);
-		// session.remove(member);
 
 		tx.commit();
 		session.clear();
 		session.close();
 	}
 
+	
+	// delete member from specific team in MemberTeam table
 	public static void deleteMemberFromTeam(int memberid, int teamid) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
-		String hql = "delete from MemberTeam id where member_id= :memberid and team_id= :teamid";
+		String hql = "delete from MemberTeam mt where member.id= :memberid and team.id= :teamid";
 		Query query = session.createQuery(hql);
 		query.setParameter("memberid", memberid);
 		query.setParameter("teamid", teamid);
@@ -189,59 +220,53 @@ public class MemberDAO {
 		int count = query.executeUpdate();
 		System.out.println(count + " Record(s) Deleted.");
 
-		// Remove from Game Table
-		// Game game = session.get(Game.class, id);
-		// session.remove(game);
-
 		tx.commit();
 		session.clear();
 		session.close();
 	}
 
+	
+	// delete member from all socials in MemberSocials table
 	public static void deleteMemberFromSocials(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
-		// Delete connection from MemberMembers Table
-		String hql = "delete from MemberSocials id where member_id= :id";
+	
+		String hql = "delete from MemberSocials ms where member.id= :id";
 		Query query = session.createQuery(hql);
 		query.setParameter("id", id);
 
 		int count = query.executeUpdate();
 		System.out.println(count + " Record(s) Deleted.");
 
-		// Remove from Member Table
-		// Member member = session.get(Member.class, id);
-		// session.remove(member);
-
 		tx.commit();
 		session.clear();
 		session.close();
 	}
 
+	
+	// Delete member from all games in MemberGames table
 	public static void deleteMemberFromGames(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
-		// Delete connection from MemberMembers Table
-		String hql = "delete from MemberGames id where member_id= :id";
+		
+		String hql = "delete from MemberGames mg where member.id= :id";
 		Query query = session.createQuery(hql);
 		query.setParameter("id", id);
 
 		int count = query.executeUpdate();
 		System.out.println(count + " Record(s) Deleted.");
 
-		// Remove from Member Table
-		// Member member = session.get(Member.class, id);
-		// session.remove(member);
-
 		tx.commit();
 		session.clear();
 		session.close();
 	}
 
+	
+	// update member
 	public static void updateMember(int id, Member member) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		Member old = session.get(Member.class, id);
@@ -258,8 +283,9 @@ public class MemberDAO {
 		old.setBirthday(member.getBirthday());
 
 		session.saveOrUpdate(old);
-		session.flush();
+		//session.flush();
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 }

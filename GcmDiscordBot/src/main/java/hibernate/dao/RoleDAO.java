@@ -1,30 +1,34 @@
 package hibernate.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.model.Member;
 import hibernate.model.MemberRoles;
 import hibernate.model.Role;
 
 public class RoleDAO {
 
+    // database access methods
+    	// add role 
 	public static void addRole(Role bean) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		session.persist(bean);
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 
+	
+	// assign role to member in MemberRoles table
 	public static void addRoleToMember(int memberID, int roleID) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		Member m = session.get(Member.class, memberID);
@@ -36,67 +40,83 @@ public class RoleDAO {
 
 		session.save(mr);
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 
+	
+	// get role
 	public static Role getRole(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		Role r = session.get(Role.class, id);
-
+		tx.commit();
+		 session.clear();
+		 session.close();
 		return r;
 	}
 
+	
+	// get role with highest id
 	public static Role getRoleWithHighestId() {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		// String hql = "select max(id) from Role";
 		Integer maxId = (Integer) session.createNativeQuery("select max(id) from Role").getSingleResult();
 
 		Role role = session.get(Role.class, maxId);
-
+		
+		 session.clear();
+		 session.close();
 		return role;
 	}
 
+	
+	// get list of all roles
 	public static List<Role> getRoles() {
-		Session session = DiscordSessionUtil.getSession();
-		String hql = "from Role";
-		Query query = session.createQuery(hql);
-		List<Role> roles = query.list();
-		session.close();
-		return roles;
-	}
+		Session session = SessionUtil.getSession();
+		List<Role> list = session.createQuery(
+			"select o from Role o",
+			Role.class)
+			.getResultList();
 
+
+		for (Role t : list) {		
+			System.out.println(t);
+		}
+		
+		 session.clear();
+		 session.close();
+		return list;
+	}
+	
+	// get roles by member id from MemberRoles table
 	public static List<Role> getRolesByMemberId(int id) {
 
 		// SELECT * FROM gcm.member_socials where member_id= '3'
 
-		Session session = DiscordSessionUtil.getSession();
-		String hql = "from MemberRoles role_id where member_id= :id";
-		Query query = session.createQuery(hql);
-		query.setParameter("id", id);
-		List<MemberRoles> rolesMember = query.list();
-		List<Role> filteredRolesList = new ArrayList<>();
+		Session session = SessionUtil.getSession();
+		List<Role> list = session.createQuery(
+			"select role r from MemberRoles m where member.id= :id",
+			Role.class)
+			.setParameter("id", id).getResultList();
 
-		for (MemberRoles m : rolesMember) {
-			int sId = m.getRole().getId();
-			Role s = session.get(Role.class, sId);
-			filteredRolesList.add(s);
 
+		for (Role o : list) {		
+			System.out.println(o);
 		}
-
-		session.close();
-		return filteredRolesList;
+		
+		 session.clear();
+		 session.close();
+		return list;
 	}
 
+	// delete role from specific member in MemberRoles table
 	public static void deleteRoleFromMember(int roleid, int memberid) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
-
-		// Delete connection from MemberRoles Table
-		// ROM a WHERE a.b = :par1 OR a.c = :par2").setParameter("par1",
-		// obj).setParameter("par2", obj);
-		String hql = "delete from MemberRoles id where role_id= :roleid and member_id= :memberid";
+		
+		String hql = "delete from MemberRoles mr where role.id= :roleid and member.id= :memberid";
 		Query query = session.createQuery(hql);
 		query.setParameter("roleid", roleid);
 		query.setParameter("memberid", memberid);
@@ -104,27 +124,28 @@ public class RoleDAO {
 		int count = query.executeUpdate();
 		System.out.println(count + " Record(s) Deleted.");
 
-		// Remove from Role Table
-//		Role role = session.get(Role.class, id);
-//		session.remove(role);
-
 		tx.commit();
 		session.clear();
 		session.close();
 	}
 
+	
+	// delete role
 	public static void deleteRole(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 		Role role = session.get(Role.class, id);
 		session.remove(role);
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 
 	}
 
+	
+	// update role
 	public static void updateRole(int id, Role role) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 		Role old = session.get(Role.class, id);
 
@@ -132,8 +153,9 @@ public class RoleDAO {
 		old.setRoleDescription(role.getRoleDescription());
 
 		session.saveOrUpdate(old);
-		session.flush();
+		//session.flush();
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 }

@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.dao.MemberDAO;
 import hibernate.model.Member;
 
@@ -14,7 +14,7 @@ public class MemberDAOTest {
 
 	public static void main(String[] args) {
 
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		int id = 5;
 		int id2 = 5;
 		int id3 = 5;
@@ -87,7 +87,7 @@ public class MemberDAOTest {
 	}
 
 	public static void updateMemberTest(int id, String s) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 
 		// Vorhandenen Member anhand id aus DB holen
 		Member m = session.get(Member.class, id);

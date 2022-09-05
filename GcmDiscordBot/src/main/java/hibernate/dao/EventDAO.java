@@ -1,121 +1,142 @@
 package hibernate.dao;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.model.Event;
 import hibernate.model.Member;
-import hibernate.model.MemberEvents;
+
 
 public class EventDAO {
+    
+    // database access methods
 
+
+    // add new event
 	public static void addEvent(Event bean) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
-
-		session.persist(bean);
+		session.persist(bean); 
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 
+	
+	// get event
 	public static Event getEvent(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		Event event = session.get(Event.class, id);
-
+		
+		tx.commit();
+		 session.clear();
+		 session.close();
 		return event;
+		
 	}
 
+	
+	// get events by member id from MemberEvents table
 	public static List<Event> getEventsByMemberId(int id) {
-		// SQL: SELECT * FROM gcm.member_events where member_id= '3'
 
-		Session session = DiscordSessionUtil.getSession();
-		String hql = "from MemberEvents event_id where member_id= :id";
-		Query query = session.createQuery(hql);
-		query.setParameter("id", id);
-		List<MemberEvents> eventsMember = query.list();
-		List<Event> filteredEventsList = new ArrayList<>();
+		Session session = SessionUtil.getSession();
+		List<Event> eventsMember = session.createQuery(
+			"select event e from MemberEvents me where member.id= :id",
+			Event.class)
+			.setParameter("id", id).getResultList();
 
-		for (MemberEvents m : eventsMember) {
-			int sId = m.getEvent().getId();
-			Event s = session.get(Event.class, sId);
-			filteredEventsList.add(s);
-			System.out.println(s);
+
+		for (Event e : eventsMember) {		
+			System.out.println(e);
 		}
-
-		session.close();
-		return filteredEventsList;
+		
+		
+		 session.clear();
+		 session.close();
+		return eventsMember;
 	}
 
+	
+	// get members by event id from MemberEvents table
 	public static List<Member> getMembersByEventId(int id) {
-		// SQL: SELECT * FROM gcm.member_events where member_id= '3'
+	    Session session = SessionUtil.getSession();
+	    
+		List<Member> eventsMember = session.createQuery(
+			"select member e from MemberEvents me where event.id= :id",
+			Member.class)
+			.setParameter("id", id).getResultList();
 
-		Session session = DiscordSessionUtil.getSession();
-		String hql = "from MemberEvents member_id where event_id= :id";
-		Query query = session.createQuery(hql);
-		query.setParameter("id", id);
-		List<MemberEvents> membersEvent = query.list();
-		List<Member> filteredEventsList = new ArrayList<>();
 
-		for (MemberEvents m : membersEvent) {
-			int sId = m.getMember().getId();
-			Member s = session.get(Member.class, sId);
-			filteredEventsList.add(s);
-			System.out.println(s);
+		for (Member e : eventsMember) {		
+			System.out.println(e);
 		}
 
-		session.close();
-		return filteredEventsList;
+		
+		 session.clear();
+		 session.close();
+		return eventsMember;
 	}
 
+	
+	// get list of all events
 	public static List<Event> getEvents() {
-		Session session = DiscordSessionUtil.getSession();
-		String hql = "from Event";
-		Query<Event> query = session.createQuery(hql);
-		List<Event> events = query.list();
-		session.close();
-		return events;
+		Session session = SessionUtil.getSession();
+		List<Event> list = session.createQuery(
+			"select o from Event o",
+			Event.class)
+			.getResultList();
+
+
+		for (Event t : list) {		
+			System.out.println(t);
+		}
+		
+		 session.clear();
+		 session.close();
+		return list;
 	}
 
+	
+	// delete event from all members in MemberEvents table
 	public static void deleteEventFromMember(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
-
-		// Delete connection from MemberEvents Table
-		String hql = "delete from MemberEvents id where event_id= :id";
+		
+		String hql = "delete from MemberEvents me where event.id= :id";
 		Query query = session.createQuery(hql);
 		query.setParameter("id", id);
 
 		int count = query.executeUpdate();
 		System.out.println(count + " Record(s) Deleted.");
 
-		// Remove from Event Table
-		// Event event = session.get(Event.class, id);
-		// session.remove(event);
-
 		tx.commit();
 		session.clear();
 		session.close();
 	}
 
+	
+	// delete event
 	public static void deleteEvent(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 		Event event = session.get(Event.class, id);
 		session.remove(event);
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 
 	}
 
+	
+	// update event
 	public static void updateEvent(int id, Event event) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 		Event old = session.get(Event.class, id);
 
@@ -126,12 +147,12 @@ public class EventDAO {
 		old.setEventEndTime(event.getEventEndTime());
 		old.setEventAddidtionalNotes(event.getEventAddidtionalNotes());
 		old.setReoccuring(event.isReoccuring());
-		// old.setMembers(event.getMembers());
 
 		session.saveOrUpdate(old);
-		session.flush();
+		//session.flush();
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 
 }

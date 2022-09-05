@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.dao.TournamentDAO;
 import hibernate.model.Tournament;
 
@@ -15,7 +15,7 @@ public class TournamentDAOTest {
 
 	public static void main(String[] args) {
 
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		int id = 2;
 		int id2 = 5;
 		int id3 = 5;
@@ -62,7 +62,7 @@ public class TournamentDAOTest {
 	}
 
 	public static void updateTournamentTest(int id, String s) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 
 		// Vorhandenen Tournament anhand id aus DB holen
 		Tournament m = session.get(Tournament.class, id);

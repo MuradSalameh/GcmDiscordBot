@@ -1,10 +1,12 @@
 package helperClasses;
 
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import hibernate.dao.MemberDAO;
@@ -24,19 +26,13 @@ public class Scheduler extends ListenerAdapter {
 	this.api = api;
     }
 
+
     public void start() throws InterruptedException {
 	scheduleTask();
     }
 
-    public static TextChannel targetTextChannel() {
-	TextChannel textChannel = api.getTextChannelsByName("log-channel", true).get(0);
-	//		TextChannel textChannel = api.getTextChannelById("703612269644218452");
-
-	return textChannel;
-    }
-
+    // Get todays birthdays from database
     public static ArrayList<Long> getBirthdays() {
-
 	List<Member> members = MemberDAO.getTodaysMembersBirthdays();
 	if (members.isEmpty()) {
 	    System.out.println("No Birthdays Today");
@@ -51,6 +47,14 @@ public class Scheduler extends ListenerAdapter {
 	return userIdList;
     }
 
+    // define target text channel for messages
+    public static TextChannel targetTextChannel() {
+	TextChannel textChannel = api.getTextChannelsByName("log-channel", true).get(0);
+	//   	TextChannel textChannel = api.getTextChannelById("703612269644218452");
+	return textChannel;
+    }
+
+    // send birthday message to text channel
     public static void sendBirthdayMessage() {
 	ArrayList<Long> memberIdsBirthday = getBirthdays();
 
@@ -58,12 +62,11 @@ public class Scheduler extends ListenerAdapter {
 	    // api.retrieveUserById(eineId).queue(user -> {
 	    targetTextChannel().sendMessage(":birthday: :gift: Alles Beste zum Geburtstag!!! " + "<@" + eineId + ">"
 		    + " :champagne_glass: :champagne:\n").queue();
-	    targetTextChannel().sendMessage("https://tenor.com/view/happy-birthday-gif-25394753").queue();
-	    // });
+	    targetTextChannel().sendMessage("https://tenor.com/view/happy-birthday-gif-25394753" + " \n").queue();	    
 	}
+    }       
 
-    }
-
+    //schedule task for daily execution at certain time
     public static void scheduleTask() throws InterruptedException {
 	ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
 	Runnable executeTask = () -> {
@@ -76,33 +79,20 @@ public class Scheduler extends ListenerAdapter {
 
 	};
 
-	/*
-	ZoneOffset zoneOffSet = ZoneOffset.of("+02:00");
-	OffsetDateTime now = OffsetDateTime.now(zoneOffSet);
-	LocalDate today = now.toLocalDate();
-	LocalDate tomorrow = today.plusDays(1);
-	OffsetDateTime tomorrowStart = OffsetDateTime.of(tomorrow, LocalTime.MIN, zoneOffSet);
-	Duration d = Duration.between(now, tomorrowStart);
-	long millisUntilTomorrowStart = d.toMillis();
+	ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Vienna"));
+	//Run Task at 00:05 ---> now.withHour(0).withMinute(5)
+	ZonedDateTime nextRun = now.withHour(10).withMinute(12).withSecond(0);
+	if(now.compareTo(nextRun) > 0)
+	    nextRun = nextRun.plusDays(1);
 
-	ScheduledFuture<?> scheduleAtFixedRate = service.scheduleAtFixedRate(executeTask, 
-		millisUntilTomorrowStart, // Initial delay, before first execution to get close to first moment of tomorrow.
-		TimeUnit.DAYS.toMillis(1), // Amount of time in each interval, between subsequent executions
-		TimeUnit.MILLISECONDS); // Unit of time intended by the numbers in previous two arguments.
-	 */
+	Duration duration = Duration.between(now, nextRun);
+	long initialDelay = duration.getSeconds();
 
-	
-	// executeTask, initialDelay (time to delay first execution), period denotes the
-	// duration between successive execution
-	ScheduledFuture<?> scheduleAtFixedRate = service.scheduleAtFixedRate(executeTask, 1, 5, TimeUnit.SECONDS);
-	while (true) {
-	    Thread.sleep(5000);
-	    if (counter == 1) {
-		System.out.println("Stopping the scheduled task!");
-		scheduleAtFixedRate.cancel(true);
-		service.shutdown();
-		break;
-	    }
-	}
+	ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);            
+	scheduler.scheduleAtFixedRate(executeTask,
+		initialDelay,
+		TimeUnit.DAYS.toSeconds(1),
+		TimeUnit.SECONDS);
+
     }
 }

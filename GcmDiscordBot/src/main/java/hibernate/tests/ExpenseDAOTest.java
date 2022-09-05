@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.dao.ExpenseDAO;
 import hibernate.model.Expense;
 
@@ -14,7 +14,7 @@ public class ExpenseDAOTest {
 
 	public static void main(String[] args) {
 
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		int id = 2;
 
 		// --------- addExpense() Test -----------//
@@ -53,7 +53,7 @@ public class ExpenseDAOTest {
 	}
 
 	public static void updateExpenseTest(int id, String s) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 
 		// Vorhandenen Expense anhand id aus DB holen
 		Expense m = session.get(Expense.class, id);

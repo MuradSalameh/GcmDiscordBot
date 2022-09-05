@@ -4,53 +4,75 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.model.Partner;
 
 public class PartnerDAO {
-
+    // database access methods
+    
+    // add partner 
 	public static void addPartner(Partner bean) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		session.persist(bean); // Dafür die add partner nicht mehr aufrufen, da direkt im bean gespeichert
 								// wird.
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 
+	
+	//get partner
 	public static Partner getPartner(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		Partner partner = session.get(Partner.class, id);
-
+		tx.commit();
+		 session.clear();
+		 session.close();
 		return partner;
 	}
 
+	
+	//get list of all partners
 	public static List<Partner> getPartners() {
-		Session session = DiscordSessionUtil.getSession();
-		String hql = "from Partner";
-		Query query = session.createQuery(hql);
-		List<Partner> partners = query.list();
-		session.close();
-		return partners;
+		Session session = SessionUtil.getSession();
+		
+		List<Partner> list = session.createQuery(
+			"select o from Partner o",
+			Partner.class)
+			.getResultList();
+
+
+		for (Partner t : list) {		
+			System.out.println(t);
+		}
+	
+		 session.clear();
+		 session.close();
+		return list;
 	}
 
+	
+	// delete partner
 	public static void deletePartner(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 		Partner partner = session.get(Partner.class, id);
 		session.remove(partner);
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 
 	}
 
+	
+	// update partner
 	public static void updatePartner(int id, Partner partner) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		Transaction tx = session.beginTransaction();
 
 		Partner old = session.get(Partner.class, id);
@@ -70,9 +92,10 @@ public class PartnerDAO {
 		old.setPhoneNumber(partner.getPhoneNumber());
 
 		session.saveOrUpdate(old);
-		session.flush();
+		//session.flush();
 		tx.commit();
-		session.close();
+		 session.clear();
+		 session.close();
 	}
 
 }

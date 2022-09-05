@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.dao.SocialDAO;
 import hibernate.model.Social;
 
@@ -13,7 +13,7 @@ public class SocialDAOTest {
 
 	public static void main(String[] args) {
 
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		int id = 1;
 		int id2 = 5;
 		int id3 = 5;
@@ -61,7 +61,7 @@ public class SocialDAOTest {
 	}
 
 	public static void updateSocialTest(int id, String s) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 
 		// Vorhandenen Social anhand id aus DB holen
 		Social m = session.get(Social.class, id);
@@ -98,7 +98,7 @@ public class SocialDAOTest {
 	}
 
 	public static void getSocialsByMemberIdTest(int id) {
-		// Session session = DiscordSessionUtil.getSession();
+		// Session session = SessionUtil.getSession();
 		/*
 		 * List<Social> socials = SocialDAO.getSocialsByMemberId(id); ArrayList<Social>
 		 * ol = new ArrayList<Social>();

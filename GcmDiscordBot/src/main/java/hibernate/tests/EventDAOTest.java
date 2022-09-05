@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.dao.EventDAO;
 import hibernate.model.Event;
 
@@ -15,7 +15,7 @@ public class EventDAOTest {
 
 	public static void main(String[] args) {
 
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		int id = 3;
 
 		// --------- addEvent() Test -----------//
@@ -60,7 +60,7 @@ public class EventDAOTest {
 	}
 
 	public static void updateEventTest(int id, String s) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 
 		// Vorhandenen Event anhand id aus DB holen
 		Event m = session.get(Event.class, id);

@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.dao.PartnerDAO;
 import hibernate.model.Partner;
 
@@ -13,7 +13,7 @@ public class PartnerDAOTest {
 
 	public static void main(String[] args) {
 
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		int id = 2;
 
 		// --------- addPartner() Test -----------//
@@ -64,7 +64,7 @@ public class PartnerDAOTest {
 	}
 
 	public static void updatePartnerTest(int id, String s) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 
 		// Vorhandenen Partner anhand id aus DB holen
 		Partner m = session.get(Partner.class, id);

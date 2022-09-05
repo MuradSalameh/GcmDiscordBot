@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.dao.RoleDAO;
 import hibernate.model.Role;
 
@@ -13,7 +13,7 @@ public class RoleDAOTest {
 
 	public static void main(String[] args) {
 
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		int id = 1;
 		int id2 = 5;
 		int id3 = 5;
@@ -58,7 +58,7 @@ public class RoleDAOTest {
 	}
 
 	public static void updateRoleTest(int id, String s) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 
 		// Vorhandenen Role anhand id aus DB holen
 		Role m = session.get(Role.class, id);
@@ -85,7 +85,7 @@ public class RoleDAOTest {
 	}
 
 	public static void getRolesByMemberTest(int id) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		List<Role> roles = RoleDAO.getRolesByMemberId(id);
 		ArrayList<Role> ol = new ArrayList<Role>();
 

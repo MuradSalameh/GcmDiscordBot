@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.hibernate.Session;
 
-import hibernate.DiscordSessionUtil;
+import hibernate.SessionUtil;
 import hibernate.dao.GameDAO;
 import hibernate.model.Game;
 
@@ -14,7 +14,7 @@ public class GameDAOTest {
 
 	public static void main(String[] args) {
 
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 		int id = 1;
 		int id2 = 3;
 		int id3 = 4;
@@ -66,7 +66,7 @@ public class GameDAOTest {
 	}
 
 	public static void updateGameTest(int id, String s) {
-		Session session = DiscordSessionUtil.getSession();
+		Session session = SessionUtil.getSession();
 
 		// Vorhandenen Game anhand id aus DB holen
 		Game m = session.get(Game.class, id);
